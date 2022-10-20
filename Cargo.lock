@@ -3,5 +3,14 @@
 version = 3
 
 [[package]]
+name = "modular_arithmetic"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "145d110a3a4980a24b61be78b65bc4757efca0e9c0a4f7ef01168333fdc8dae7"
+
+[[package]]
 name = "rust-vic-cipher"
 version = "0.1.0"
+dependencies = [
+ "modular_arithmetic",
+]
