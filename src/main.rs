@@ -8,6 +8,13 @@ use core::str;
 
 const MONTHS: [&str; 11] = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Oct","Nov","Dec"];
 
+fn truncate(s: &str, max_chars: usize) -> &str {
+    match s.char_indices().nth(max_chars) {
+        None => s,
+        Some((idx, _)) => &s[..idx],
+    }
+}
+
 pub fn generate_key(personal_number: i32, date: &str, phrase: &str, keygroup: i32) -> String {
     println!("Personal Number: {personal_number}");
     println!("Date: {date}");
@@ -19,18 +26,15 @@ pub fn generate_key(personal_number: i32, date: &str, phrase: &str, keygroup: i3
 
     let vec: Vec<&str> = date.splitn(3, &" ").collect();
     let day: &str = vec[0];
-    let month: &str = vec[2];
-    let year: &str = vec[3];
+    let month: &str = vec[1];
+    let year: &str = vec[2];
 
     // truncate date to 5 digits
 
-    let months_index = MONTHS
-        .into_iter()
-        .position(|x| x == month)
-        .unwrap();
+    let months_index = MONTHS.iter().position(|v| v == &month).unwrap_or(0) + 1;
 
-    
-    let truncated_date: &str = &((day.to_owned() + &*months_index.to_string() + year));
+    let binding: &String = &(day.to_owned() + &*months_index.to_string() + year);
+    let truncated_date: &str = truncate(binding, 5);
 
     return truncated_date.to_string();
 }
