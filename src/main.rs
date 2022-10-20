@@ -72,8 +72,9 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     println!("C: {c}");
 
     // D = Write out the first 20 letters from the secret Phrase
-
-    
+    let phrase_no_space: String = phrase.to_ascii_uppercase().replace(" ", "");
+    let d: &str = truncate(&phrase_no_space, 20);
+    println!("D: {d}");
 
     return 0;
 }
