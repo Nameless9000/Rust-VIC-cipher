@@ -76,6 +76,25 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     let d: &str = truncate(&phrase_no_space, 20);
     println!("D: {d}");
 
+    // E
+
+    fn sequentialize (s: &str) -> &str {
+        let s_slice: &str = &s[..];
+        let mut chars: Vec<char> = s_slice.chars().collect();
+        chars.sort_by(|a, b| b.cmp(a));
+
+        for c in chars {
+
+        }
+
+        s
+    }
+
+    let e1: &str = sequentialize(&d[0..10]);
+    let e2: &str = sequentialize(&d[10..20]);
+
+    // THIS TOOK ME 4 AND A HALF HOURS... WHY DID IT TAKE THIS LONG IM ONLY ON E
+
     return 0;
 }
 
