@@ -6,7 +6,7 @@ https://en.wikipedia.org/wiki/VIC_cipher
 */
 use core::str;
 
-const MONTHS: [&str; 11] = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Oct","Nov","Dec"];
+const MONTHS: [&str; 12] = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 fn truncate(s: &str, max_chars: usize) -> &str {
     match s.char_indices().nth(max_chars) {
@@ -31,7 +31,10 @@ pub fn generate_key(personal_number: i32, date: &str, phrase: &str, keygroup: i3
 
     // truncate date to 5 digits
 
-    let months_index = MONTHS.iter().position(|v| v == &month).unwrap_or(0) + 1;
+    let months_index = MONTHS
+        .iter()
+        .position(|v| v.to_ascii_lowercase() == month.to_ascii_lowercase())
+        .unwrap_or(0) + 1;
 
     let binding: &String = &(day.to_owned() + &*months_index.to_string() + year);
     let truncated_date: &str = truncate(binding, 5);
