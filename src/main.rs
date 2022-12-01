@@ -160,6 +160,28 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
     println!("F: {} {}", f1, f2);
 
+    // G - mod10 e.1 + f.1 
+
+    let mut c_str: String = String::from("");
+
+    for i in 0..10 {
+        let a_char: char = e1.chars().nth(i).unwrap();
+        let b_char: char = f1.chars().nth(i).unwrap();
+
+        const RADIX: u32 = 10;
+
+        let a_int: i64 = a_char.to_digit(RADIX).unwrap().into();
+        let b_int: i64 = b_char.to_digit(RADIX).unwrap().into();
+
+        let sub: u64 = mod_sub(a_int, b_int, 10);
+
+        c_str.push_str(&sub.to_string());
+    }
+
+    let g: String = c_str.to_string();
+
+    println!("G: {}", g);
+
     return 0;
 }
 
