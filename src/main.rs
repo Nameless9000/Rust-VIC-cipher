@@ -4,13 +4,14 @@ wikipedia = helpful
 https://en.wikipedia.org/wiki/VIC_cipher
 
 */
-use core::str;
+use core::{str};
 use modular_arithmetic::*;
 
 use std::{collections::HashMap, cmp::Ordering};
 
 const MONTHS: [&str; 12] = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const ALPHABET: [&str; 26] = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+const NUMBERS: [&str; 10] = ["1","2","3","4","5","6","7","8","9","0"];
 
 fn truncate(s: &str, max_chars: usize) -> &str {
     match s.char_indices().nth(max_chars) {
@@ -131,19 +132,25 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     fn chain_addition (s: String) -> String {
         let mut output: String = String::from("");
 
-        for i in 0..5 {
+        let mut first_ans: i64 = 0;
+
+        for i in 0..s.len() {
             let char1: &str = &(s.chars().nth(i).unwrap()).to_string();
             let digit1: i64 = char1.parse().unwrap();
 
             let mut iv = i+1;
-            if i >= 4 {
-                iv = 2;
-            }
+            if i >= s.len() - 1 {iv = 0;}
 
             let char2: &str = &(s.chars().nth(iv).unwrap()).to_string();
-            let digit2: i64 = char2.parse().unwrap();
+            let mut digit2: i64 = char2.parse().unwrap();
+
+            if i >= s.len() - 1 {
+                digit2 = first_ans;
+            }
 
             let add: u64 = mod_sub(digit1, digit2, 10);
+
+            if i == 0 { first_ans = add.try_into().unwrap(); }
 
             output.push_str(&add.to_string())
         }
@@ -202,6 +209,62 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     let h = digit_encode(e2, f2, g);
 
     println!("H: {}", h);
+
+    // J - seq number
+
+    fn number_sequentialize (s: &str) -> String {
+        let mut alpha_map = HashMap::new();
+
+        for i in 0..10 {
+            let char: &str = &(s.chars().nth(i).unwrap()).to_string();
+
+            let alphabet_index = NUMBERS
+                .iter()
+                .position(|v| v == &char)
+                .unwrap_or(0);
+
+            alpha_map.insert(i, alphabet_index);
+        }
+
+        let mut hash_vec: Vec<(&usize, &usize)> = alpha_map.iter().collect();
+        hash_vec.sort_unstable_by(|a, b| {
+            match a.1.cmp(&b.1) {
+                Ordering::Equal => { a.0.cmp(&b.0) }
+                v => { v }
+            }
+        });
+
+        let mut output: String = String::from("");
+
+        for i in 0..10 {
+            let mut index = hash_vec.iter().position(|&a| a.0 == &i).unwrap() + 1;
+
+            if index >= 10 {
+                index = 0;
+            }
+
+            output.push_str(&index.to_string());
+        }
+
+        output
+    }
+
+    let j: String = number_sequentialize(h.as_str());
+
+    println!("J: {}", j);
+
+    // K,L,M,N,P - Chain Addition 50 digits from h
+
+    let k: String = chain_addition(h);
+    println!("K: {}", k);
+    let l: String = chain_addition(k);
+    println!("L: {}", l);
+    let m: String = chain_addition(l);
+    println!("M: {}", m);
+    let n: String = chain_addition(m);
+    println!("N: {}", n);
+    let p: String = chain_addition(n);
+    println!("P: {}", p);
 
     return 0;
 }
