@@ -7,7 +7,10 @@ https://en.wikipedia.org/wiki/VIC_cipher
 use core::str;
 use modular_arithmetic::*;
 
+use std::{collections::HashMap, cmp::Ordering};
+
 const MONTHS: [&str; 12] = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const ALPHABET: [&str; 26] = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
 fn truncate(s: &str, max_chars: usize) -> &str {
     match s.char_indices().nth(max_chars) {
@@ -74,18 +77,58 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     // D = Write out the first 20 letters from the secret Phrase
     let phrase_no_space: String = phrase.to_ascii_uppercase().replace(" ", "");
     let d: &str = truncate(&phrase_no_space, 20);
-    println!("D: {d}");
+
+    let d1: &str = &d[0..10];
+    let d2: &str = &d[10..20];
+
+    println!("D: {} {}", d1, d2);
 
     // E
+    fn sequentialize (s: &str) -> String {
+        let mut alpha_map = HashMap::new();
 
-    fn sequentialize (s: &str) -> &str {
-        "help me pls"
+        for i in 0..10 {
+            let char: &str = &(s.chars().nth(i).unwrap()).to_string();
+
+            let alphabet_index = ALPHABET
+                .iter()
+                .position(|v| v == &char)
+                .unwrap_or(0);
+
+            alpha_map.insert(i, alphabet_index);
+        }
+
+        let mut hash_vec: Vec<(&usize, &usize)> = alpha_map.iter().collect();
+        hash_vec.sort_unstable_by(|a, b| {
+            match a.1.cmp(&b.1) {
+                Ordering::Equal => { a.0.cmp(&b.0) }
+                v => { v }
+            }
+        });
+
+        let mut output: String = String::from("");
+
+        for i in 0..10 {
+            let mut index = hash_vec.iter().position(|&a| a.0 == &i).unwrap() + 1;
+
+            if index >= 10 {
+                index = 0;
+            }
+
+            output.push_str(&index.to_string());
+        }
+
+        output
     }
 
-    let e1: &str = sequentialize(&d[0..10]);
-    let e2: &str = sequentialize(&d[10..20]);
+    let e1: String = sequentialize(d1);
+    let e2: String = sequentialize(d2);
 
-    // THIS TOOK ME 4 AND A HALF HOURS... WHY DID IT TAKE THIS LONG IM ONLY ON E
+    println!("E: {} {}", e1, e2);
+
+    // F
+
+    
 
     return 0;
 }
