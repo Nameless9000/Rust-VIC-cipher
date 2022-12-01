@@ -121,14 +121,44 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
         output
     }
 
-    let e1: String = sequentialize(d1);
-    let e2: String = sequentialize(d2);
+    let e1: String = sequentialize(d1).to_owned();
+    let e2: String = sequentialize(d2).to_owned();
 
     println!("E: {} {}", e1, e2);
 
     // F
 
-    
+    fn chain_addition (s: String) -> String {
+        let mut output: String = String::from("");
+
+        for i in 0..5 {
+            let char1: &str = &(s.chars().nth(i).unwrap()).to_string();
+            let digit1: i64 = char1.parse().unwrap();
+
+            let mut iv = i+1;
+            if i >= 4 {
+                iv = 2;
+            }
+
+            let char2: &str = &(s.chars().nth(iv).unwrap()).to_string();
+            let digit2: i64 = char2.parse().unwrap();
+
+            let add: u64 = mod_sub(digit1, digit2, 10);
+
+            output.push_str(&add.to_string())
+        }
+
+        output
+    }
+
+    let mut f1 = c.to_string();
+    f1.push_str(
+        &chain_addition(c.to_string())
+    );
+
+    let f2: String = String::from("1234567890");
+
+    println!("F: {} {}", f1, f2);
 
     return 0;
 }
