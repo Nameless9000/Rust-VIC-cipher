@@ -162,7 +162,7 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
     // G - mod10 e.1 + f.1 
 
-    let mut c_str: String = String::from("");
+    let mut g_str: String = String::from("");
 
     for i in 0..10 {
         let a_char: char = e1.chars().nth(i).unwrap();
@@ -175,12 +175,33 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
         let sub: u64 = mod_sub(a_int, b_int, 10);
 
-        c_str.push_str(&sub.to_string());
+        g_str.push_str(&sub.to_string());
     }
 
-    let g: String = c_str.to_string();
+    let g: String = g_str.to_string();
 
     println!("G: {}", g);
+
+    // H - encoding
+
+    fn digit_encode (k: String, a: String, s: String) -> String {
+        let mut str: String = String::from("");
+
+        for i in 0..s.len() {
+            let char: char = s.chars().nth(i).unwrap();
+            let index = a.chars().position(|a| a == char).unwrap();
+
+            let new_char: char = k.chars().nth(index).unwrap();
+
+            str.push_str(&new_char.to_string());
+        }
+
+        str
+    }
+
+    let h = digit_encode(e2, f2, g);
+
+    println!("H: {}", h);
 
     return 0;
 }
