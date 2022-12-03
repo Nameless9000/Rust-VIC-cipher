@@ -302,9 +302,10 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
         }
     }
 
-    println!("{}, {}", digitx1, digitx2);
+    println!("{}, {}", digitx2, digitx1);
 
-    let permutation_length: usize = (personal_number + digitx1 + digitx2).try_into().unwrap();
+    let permutation_length1: usize = (personal_number + digitx2).try_into().unwrap();
+    let permutation_length2: usize = (personal_number + digitx1).try_into().unwrap();
 
     fn columnar_transposition (key: &str, msg: &str) -> String {
         let mut plaintext = String::from(msg);
@@ -357,11 +358,17 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
     let transposed_block = columnar_transposition(j.as_str(), &block);
 
-    let q = &transposed_block[0..permutation_length];
+    let q = &transposed_block[0..permutation_length1];
 
     println!("Q: {}",q);
 
     // R
+
+    let r = &transposed_block[permutation_length1..permutation_length1+permutation_length2];
+
+    println!("R: {}",r);
+
+    // S
 
     return 0;
 }
