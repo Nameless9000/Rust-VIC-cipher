@@ -255,16 +255,115 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
     // K,L,M,N,P - Chain Addition 50 digits from h
 
-    let k: String = chain_addition(h);
+    let binding = chain_addition(h).to_owned();
+    let k: &str = binding.as_str();
     println!("K: {}", k);
-    let l: String = chain_addition(k);
+    let binding = chain_addition(k.to_string()).to_owned();
+    let l: &str = binding.as_str();
     println!("L: {}", l);
-    let m: String = chain_addition(l);
+    let binding = chain_addition(l.to_string()).to_owned();
+    let m: &str = binding.as_str();
     println!("M: {}", m);
-    let n: String = chain_addition(m);
+    let binding = chain_addition(m.to_string()).to_owned();
+    let n: &str = binding.as_str();
     println!("N: {}", n);
-    let p: String = chain_addition(n);
+    let binding = chain_addition(n.to_string()).to_owned();
+    let p: &str = binding.as_str();
     println!("P: {}", p);
+
+    let mut block = String::from("");
+    block.push_str(&k);
+    block.push_str(&l);
+    block.push_str(&m);
+    block.push_str(&n);
+    block.push_str(&p);
+
+    // Q
+
+    let mut digitx1: i64 = 0;
+    let mut digitx2: i64 = 0;
+
+    let mut digit_count: i32 = 0;
+
+    for i in 0..9 {
+        let char: String = p.chars().nth(9-i).unwrap().to_string();
+        let digit: i64 = char.parse().unwrap();
+
+        if digit % 2 == 1 || digit == 0 {
+            if digit_count == 0 {
+                digitx1 = digit;
+                digit_count = 1;
+                continue;
+            }
+            if digit_count == 1 {
+                digitx2 = digit;
+                break;
+            }
+        }
+    }
+
+    println!("{}, {}", digitx1, digitx2);
+
+    let permutation_length: usize = (personal_number + digitx1 + digitx2).try_into().unwrap();
+
+    fn columnar_transposition (key: &str, msg: &str) -> String {
+        let num_cols = 10;
+        let num_rows = 5;
+        let mut matrix: Vec<Vec<char>> = vec![vec!['\0'; num_rows]; num_cols];
+
+        // Fill the matrix with the plaintext characters
+        let mut col = 1;
+        let mut row = 0;
+        for ch in msg.chars() {
+            if col == num_cols {
+                matrix[0][row] = ch;
+                col = 1;
+                row += 1;
+                continue;
+            }else{
+                matrix[col][row] = ch;
+                col += 1;
+            }
+        }
+
+        let mut columns: Vec<Vec<char>> = Vec::new();
+        for ch in NUMBERS {
+            let col: usize = ch.to_string().parse().unwrap();
+            let clone = matrix[col].clone();
+            println!("{}: {:?}",col,clone);
+            columns.push(clone);
+        }
+
+        let mut alpha_map: HashMap<usize, usize> = HashMap::new();
+
+        for i in 0..10 {
+            let char: &str = &(key.chars().nth(i).unwrap()).to_string();
+
+            alpha_map.insert(i, char.parse().unwrap());
+        }
+
+  
+        let mut ciphertext = String::from("");
+        for col in 0..num_cols {
+            let mut index = alpha_map.iter().position(|a| a.0 == &col).unwrap();
+
+            if index >= num_cols {
+                index = 0;
+            }
+
+            let c: String = columns[index].iter().collect();
+            ciphertext.push_str(&c);
+        }
+
+        ciphertext
+    }
+
+
+    let transposed_block = columnar_transposition(j.as_str(), &block);
+
+    let q = &transposed_block[0..permutation_length];
+
+    println!("Q: {}",q);
 
     return 0;
 }
