@@ -302,8 +302,6 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
         }
     }
 
-    println!("{}, {}", digitx2, digitx1);
-
     let permutation_length1: usize = (personal_number + digitx2).try_into().unwrap();
     let permutation_length2: usize = (personal_number + digitx1).try_into().unwrap();
 
