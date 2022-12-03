@@ -307,54 +307,50 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     let permutation_length: usize = (personal_number + digitx1 + digitx2).try_into().unwrap();
 
     fn columnar_transposition (key: &str, msg: &str) -> String {
-        let num_cols = 10;
-        let num_rows = 5;
-        let mut matrix: Vec<Vec<char>> = vec![vec!['\0'; num_rows]; num_cols];
+        let mut plaintext = String::from(msg);
+        let key = String::from(key);
 
-        // Fill the matrix with the plaintext characters
-        let mut col = 1;
-        let mut row = 0;
-        for ch in msg.chars() {
-            if col == num_cols {
-                matrix[0][row] = ch;
-                col = 1;
-                row += 1;
-                continue;
-            }else{
-                matrix[col][row] = ch;
-                col += 1;
+        plaintext = format!("{}{}",key,plaintext);
+
+        // Determine the dimensions of the grid
+        let columns = key.len();
+        let rows = (plaintext.len() as f64 / columns as f64).ceil() as usize;
+
+        // Create a grid to hold the plaintext
+        let mut grid: Vec<Vec<char>> = vec![vec![' '; columns]; rows];
+
+        // Fill the grid with the plaintext
+        let mut index = 0;
+        for row in 0..rows {
+            for col in 0..columns {
+                if index < plaintext.len() {
+                    grid[row][col] = plaintext.chars().nth(index).unwrap();
+                    index += 1;
+                }
             }
         }
 
-        let mut columns: Vec<Vec<char>> = Vec::new();
-        for ch in NUMBERS {
-            let col: usize = ch.to_string().parse().unwrap();
-            let clone = matrix[col].clone();
-            println!("{}: {:?}",col,clone);
-            columns.push(clone);
-        }
+        // Create a new string to hold the ciphertext
+        let mut ciphertext = String::new();
 
-        let mut alpha_map: HashMap<usize, usize> = HashMap::new();
+        // Read the ciphertext off of the grid according to the key
+        for numb in NUMBERS {
+            let mut key_index: usize = 0;
 
-        for i in 0..10 {
-            let char: &str = &(key.chars().nth(i).unwrap()).to_string();
-
-            alpha_map.insert(i, char.parse().unwrap());
-        }
-
-  
-        let mut ciphertext = String::from("");
-        for col in 0..num_cols {
-            let mut index = alpha_map.iter().position(|a| a.0 == &col).unwrap();
-
-            if index >= num_cols {
-                index = 0;
+            for col in 0..columns {
+                let key_char = key.chars().nth(col).unwrap();
+                if format!("{}",key_char) == numb {
+                    key_index = key.find(key_char).unwrap();
+                    break;
+                }
             }
 
-            let c: String = columns[index].iter().collect();
-            ciphertext.push_str(&c);
+            for row in 1..rows {
+                ciphertext.push(grid[row][key_index]);
+            }
         }
 
+        // return ciphertext
         ciphertext
     }
 
@@ -364,6 +360,8 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
     let q = &transposed_block[0..permutation_length];
 
     println!("Q: {}",q);
+
+    // R
 
     return 0;
 }
