@@ -20,11 +20,11 @@ fn truncate(s: &str, max_chars: usize) -> &str {
     }
 }
 
-pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i64) -> i64 {
+pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i64) -> [String; 3] {
     println!("Personal Number: {personal_number}");
     println!("Date: {date}");
     println!("Phrase: {phrase}");
-    println!("Keygroup: {keygroup}");
+    println!("Keygroup: {keygroup}\n");
 
     // A = keygroup
     let a: i64 = keygroup;
@@ -372,7 +372,7 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
     println!("S: {}",s);
 
-    return 0;
+    return [String::from(q),String::from(r),s];
 }
 
 fn main() {
@@ -381,7 +381,15 @@ fn main() {
     let phrase: &str = "Twas the night before Christmas";
     let keygroup: i64 = 72401;
 
-    let key: i64 = generate_key(personal_number, date, phrase, keygroup);
+    println!("\nSTART KEY GEN");
 
-    println!("Key: {key}");
+    let keys = generate_key(personal_number, date, phrase, keygroup);
+
+    println!("END KEY GEN\n");
+
+    let q = &keys[0];
+    let r = &keys[1];
+    let s = &keys[2];
+
+    println!("Q: {} | R: {} | S: {}", q,r,s);
 }
