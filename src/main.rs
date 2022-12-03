@@ -370,6 +370,10 @@ pub fn generate_key(personal_number: i64, date: &str, phrase: &str, keygroup: i6
 
     // S
 
+    let s = number_sequentialize(p);
+
+    println!("S: {}",s);
+
     return 0;
 }
 
